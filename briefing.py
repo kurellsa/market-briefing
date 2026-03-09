@@ -12,7 +12,7 @@ from groq import Groq
 from tavily import TavilyClient
 
 # ── Config ────────────────────────────────────────────────────────────────────
-RECIPIENTS = ["nagapavan.mummadi@gmail.com", "kurellsa@gmail.com"]
+RECIPIENTS = ["nagapavan.mummadi@gmail.com", "stevehydr@gmail.com"]
 TIMEZONE   = "America/New_York"
 MODEL      = "llama-3.3-70b-versatile"
 
@@ -197,3 +197,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
