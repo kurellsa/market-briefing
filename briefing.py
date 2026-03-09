@@ -153,7 +153,7 @@ def wrap_html(body: str, date: str) -> str:
 
 def send_email(html: str, date: str) -> None:
     sender   = os.environ["GMAIL_ADDRESS"]
-    password = os.environ["GMAIL_APP_PASSWORD"]
+    password = os.environ["GMAIL_APP_PASSWORD"].replace(" ", "")
     subject  = f"Morning Market Briefing — {date}"
 
     msg = MIMEMultipart("alternative")
