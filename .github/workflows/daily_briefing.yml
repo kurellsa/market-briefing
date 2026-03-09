@@ -1,0 +1,39 @@
+name: Daily Market Briefing
+
+on:
+  schedule:
+    # 8:30 AM EDT (Apr–Oct) = 12:30 UTC
+    - cron: '30 12 * * 1-5'
+    # 8:30 AM EST (Nov–Mar) = 13:30 UTC
+    - cron: '30 13 * * 1-5'
+  workflow_dispatch:   # allows manual trigger from GitHub Actions UI
+
+jobs:
+  send-briefing:
+    runs-on: ubuntu-latest
+
+    # Prevent duplicate runs when both cron schedules fire on DST transition days
+    concurrency:
+      group: daily-briefing-${{ github.run_id }}
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate and send briefing
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TAVILY_API_KEY:    ${{ secrets.TAVILY_API_KEY }}
+          GMAIL_ADDRESS:     ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: python briefing.py
