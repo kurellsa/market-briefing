@@ -152,9 +152,8 @@ def wrap_html(body: str, date: str) -> str:
 
 
 def send_email(html: str, date: str) -> None:
-    sender   = os.environ["GMAIL_ADDRESS"]
+    sender   = "kurellsa@gmail.com"
     password = os.environ["GMAIL_APP_PASSWORD"].replace(" ", "")
-    print(f"[debug] sender length : {len(sender)}")
     print(f"[debug] password length: {len(password)}")
     subject  = f"Morning Market Briefing — {date}"
 
