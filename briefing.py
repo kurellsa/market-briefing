@@ -13,6 +13,7 @@ from tavily import TavilyClient
 
 # ── Config ────────────────────────────────────────────────────────────────────
 RECIPIENTS = ["nagapavan.mummadi@gmail.com", "stevehydr@gmail.com"]
+BCC        = ["kurellsa@gmail.com", "ashokmote@gmail.com"]
 TIMEZONE   = "America/New_York"
 MODEL      = "llama-3.3-70b-versatile"
 
@@ -101,11 +102,11 @@ def run_searches(tavily: TavilyClient, date: str) -> str:
     for template in SEARCH_QUERIES:
         query = template.format(date=date)
         try:
-            resp = tavily.search(query=query, search_depth="basic", max_results=5)
+            resp = tavily.search(query=query, search_depth="basic", max_results=3)
             blocks.append(f"### Query: {query}")
             for r in resp.get("results", []):
                 title   = r.get("title", "")
-                content = r.get("content", "").strip()
+                content = r.get("content", "").strip()[:250]
                 url     = r.get("url", "")
                 blocks.append(f"**{title}**\n{content}\n{url}")
         except Exception as exc:
@@ -232,18 +233,24 @@ def send_email(html: str, date: str) -> None:
     msg.attach(MIMEText("Please open this email in an HTML-capable client.", "plain"))
     msg.attach(MIMEText(html, "html"))
 
+    all_recipients = RECIPIENTS + BCC
     with smtplib.SMTP("smtp.gmail.com", 587) as smtp:
         smtp.ehlo()
         smtp.starttls()
         smtp.login(sender, password)
-        smtp.sendmail(sender, RECIPIENTS, msg.as_string())
+        smtp.sendmail(sender, all_recipients, msg.as_string())
 
-    print(f"Sent to: {', '.join(RECIPIENTS)}")
+    print(f"Sent to: {', '.join(RECIPIENTS)} | BCC: {', '.join(BCC)}")
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 def main() -> None:
+    now_et = datetime.now(ZoneInfo(TIMEZONE))
+    if not (7 <= now_et.hour < 11):
+        print(f"Skipping: ET time is {now_et.strftime('%H:%M')}, outside 7–11 AM window.")
+        return
+
     date = get_today()
     print(f"[1/4] Date: {date}")
 
